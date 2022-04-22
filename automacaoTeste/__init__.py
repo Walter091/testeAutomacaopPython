@@ -1,6 +1,5 @@
-import autoTesteBase
-import autoExplorer
+import AutoBase
+import AutoExplorer
 
-autoExplorer.openExplorerFile()
-# autoTesteBase.localizationPositionMouse()
-
+AutoExplorer.Index()
+# AutoBase.localizationPositionMouse()
