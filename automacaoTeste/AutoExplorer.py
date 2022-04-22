@@ -1,7 +1,8 @@
-import pyautogui
+import pyautogui as py
+from pyautogui import press, leftClick, rightClick, doubleClick, moveTo
 from nucleo import InfoMsg, Atalhos_Teclado
 import AutoBase
-import time
+from time import sleep
 from pyperclip import paste
 
 NumFile = None
@@ -18,9 +19,9 @@ def Index():
     #Abrindo o Explorador de Arquivos
     AutoBase.openExplorerFiles()
     #Maximizando a tela
-    time.sleep(1.5)
-    pyautogui.moveTo(x=858, y=152)
-    pyautogui.leftClick()
+    sleep(1)
+    moveTo(x=858, y=152)
+    leftClick()
 
     #Acessando e informando o caminho do arquivo zip
     openPastaOriginal()
@@ -28,93 +29,105 @@ def Index():
     entra = True
     indice = 1
     while entra:
-        if(abrirArquivo(indice)):
-            time.sleep(5)
-            salvarArquivo(indice)
-            time.sleep(2)
-            closeFile()
-            Atalhos_Teclado.altTab()
-            createPlanilha(indice)
-            Atalhos_Teclado.altTab()
-            time.sleep(2)
-            indice = indice + 1
-            entra = True
+        if indice <= 11:
+            if abrirArquivo(indice):
+                sleep(2)
+                salvarArquivo(indice)
+                sleep(2)
+                closeFile()
+                Atalhos_Teclado.altTab()
+                createPlanilha(indice)
+                sleep(2)
+                indice = indice + 1
+                entra = True
+            else:
+                InfoMsg.msgInicializacao("Impossivel Abrir arquivos .docx"
+                                         " ou arquivos que não começam com um Númeral!!"
+                                         "Pressione 'Enter' para Continuar.")
+                press("esc")
+                continue
         else:
-            InfoMsg.msgInicializacao("Impossivel Abrir arquivos .docx ou arquivos que não começam com um Númeral!!")
-            continue
+            entra = False
+
+    InfoMsg("Automação encerrada. Obrigado e volte Sempre!")
 
 def openPastaOriginal():
     searchFiles("Downloads", "RPA-Artigo")
-    time.sleep(5)
-    pyautogui.moveTo(x=255, y=158)
-    pyautogui.doubleClick()
+    sleep(2)
+    moveTo(x=255, y=158)
+    doubleClick()
 
 def ordenarPorPdf():
-    pyautogui.moveTo(x=569, y=103)
-    pyautogui.leftClick()
-    pyautogui.press("down")
-    pyautogui.press("enter")
+    moveTo(x=569, y=103)
+    leftClick()
+    press("down")
+    press("enter")
+
+def ordenarPorNome():
+    moveTo(x=262, y=99)
+    leftClick()
 
 def abrirArquivo(indice):
-    time.sleep(3)
+    sleep(2)
     conteudo = None
-    if (indice == 1):
+    if indice == 1:
         ordenarPorPdf()
-        pyautogui.press("down", 1)
-        pyautogui.press("up")
-        pyautogui.moveTo(x=524, y=133)
-        pyautogui.rightClick()
-        pyautogui.press("down", 5)
-        pyautogui.press("enter")
-        pyautogui.hotkey('ctrl', 'c') #Copia conteúdo selecionado
-        time.sleep(5)
+        ordenarPorNome()
+        press("down", 1)
+        press("up")
+        moveTo(x=524, y=133)
+        rightClick()
+        press("down", 5)
+        press("enter")
+        py.hotkey('ctrl', 'c') #Copia conteúdo selecionado
+        sleep(2)
         conteudo = paste()
-        pyautogui.typewrite(conteudo)  # Digita o texto da variável conteúdo
+        py.typewrite(conteudo)  # Digita o texto da variável conteúdo
         file = str(conteudo)
-        if (validationArquivo(file)):
-            pyautogui.press("enter")
-            time.sleep(1)
-            pyautogui.press("enter")
+        if validationArquivo(file):
+            press("enter")
+            sleep(1)
+            press("enter")
             return True
         else:
             return False
     else:
-        pyautogui.press("down", 1)
-        pyautogui.press("apps")
-        pyautogui.press("down", 5)
-        pyautogui.press("enter")
-        pyautogui.hotkey('ctrl', 'c') #Copia conteúdo selecionado
+        press("down", indice-1)
+        press("apps")
+        press("down", 5)
+        press("enter")
+        py.hotkey('ctrl', 'c') #Copia conteúdo selecionado
         conteudo = paste()
-        pyautogui.typewrite(conteudo)  # Digita o texto da variável conteúdo
-        time.sleep(2)
+        py.typewrite(conteudo)  # Digita o texto da variável conteúdo
+        sleep(2)
         file = str(conteudo)
-        if (validationArquivo(file)):
-            pyautogui.press("enter")
-            time.sleep(1)
-            pyautogui.press("enter")
+        if validationArquivo(file):
+            press("enter")
+            sleep(1)
+            press("enter")
             return True
         else:
             return False
 
 
 def salvarArquivo(indice):
-    time.sleep(5)
-    pyautogui.moveTo(x=31, y=50)
-    pyautogui.leftClick()
-    time.sleep(5)
-    pyautogui.moveTo(x=83, y=239)
-    pyautogui.leftClick()
-    time.sleep(5)
-    pyautogui.write("Pagina " + NumFile + " - Modificado")
-    time.sleep(3)
-    pyautogui.press("enter")
+    sleep(5)
+    moveTo(x=31, y=50)
+    leftClick()
+    sleep(3)
+    moveTo(x=83, y=239)
+    leftClick()
+    sleep(4)
+    py.write("Pagina " + NumFile + " - Modificado")
+    sleep(3)
+    press("enter")
     global Status
     Status = "documento alterado"
 
 def validationArquivo(file):
     #Verifica se è numerica e .pdf
-    if (file[0].isnumeric()):
-        if(file.__contains__(".pdf")):
+    if file[0].isnumeric():
+        if file.__contains__(".pdf"):
             setInfoNameFile(file)
             return True
     else:
@@ -123,7 +136,7 @@ def validationArquivo(file):
 def setInfoNameFile(file):
     global NumFile
     global NameFIle
-    if(file[0:2].isnumeric()):
+    if file[0:2].isnumeric():
         NumFile = file[0:2]
     else:
         NumFile = file[0]
@@ -134,164 +147,167 @@ def setInfoNameFile(file):
 # ----------------------------------------------------------------------------
 
 def createPlanilha(indice):
-    if (indice ==1):
+    if indice == 1:
         AutoBase.openWPSOfiice()
         #Entrando na aréa de planilha
-        pyautogui.moveTo(x=232, y=138)
-        pyautogui.leftClick()
-        time.sleep(10)
+        moveTo(x=232, y=138)
+        leftClick()
+        sleep(3)
         #Criando uma planilha nova
-        pyautogui.moveTo(x=391, y=314)
-        pyautogui.leftClick()
-        time.sleep(7)
+        moveTo(x=391, y=314)
+        leftClick()
+        sleep(3)
         criarCabecalho()
-        time.sleep(2)
+        sleep(1)
     else:
-        time.sleep(2)
+        sleep(2)
         searchFiles("Documentos", "Relatorio de execucao")
-        time.sleep(5.5)
-        pyautogui.moveTo(x=320, y=116)
-        pyautogui.doubleClick()
-        time.sleep(5)
+        sleep(3)
+        py.moveTo(x=320, y=116)
+        py.doubleClick()
+        sleep(3)
 
-        # pyautogui.moveTo(x=255, y=319)
-        # pyautogui.doubleClick()
+        # py.moveTo(x=255, y=319)
+        # py.doubleClick()
         # time.sleep(7)
 
     addInfoPlanilha(indice)
     salvarPlanilha(indice)
-    if(indice != 1):
+    Atalhos_Teclado.altTab()
+    if indice != 1:
         openPastaOriginal()
 
 def criarCabecalho():
     #Seleciona o campo do cabecalho
+    sleep(5)
     mesclarCelulas()
     #Voltando pro começo da planilha
-    pyautogui.moveTo(x=93, y=205)
-    pyautogui.leftClick()
+    moveTo(x=93, y=205)
+    leftClick()
     #Selecionando
-    with pyautogui.hold('shift'):
-        pyautogui.press('right')
-        pyautogui.press("down", 10)
+    with py.hold('shift'):
+        press('right')
+        press("down", 10)
 
     #Clica em Inserir
-    pyautogui.moveTo(x=323, y=46)
-    pyautogui.leftClick()
-    time.sleep(1.5)
+    moveTo(x=323, y=46)
+    leftClick()
+    sleep(1)
     #Clica na setinha de lado
-    pyautogui.moveTo(x=1016, y=100)
-    pyautogui.leftClick()
-    time.sleep(2.5)
+    moveTo(x=1016, y=100)
+    leftClick()
+    sleep(2)
     #Clica em cabecalho e rodapé
-    pyautogui.moveTo(x=359, y=94)
-    pyautogui.leftClick()
-    time.sleep(2.5)
+    moveTo(x=359, y=94)
+    leftClick()
+    sleep(2)
     #Clica em cabeçalho personalizado
-    pyautogui.moveTo(x=662, y=277)
-    pyautogui.leftClick()
-    time.sleep(2.5)
+    moveTo(x=662, y=277)
+    leftClick()
+    sleep(2)
     #Adiciona as colunas
-    pyautogui.write("Nome do Documento")
-    pyautogui.press("tab")
-    pyautogui.write("Status")
-    time.sleep(2.5)
-    pyautogui.moveTo(x=695, y=525)
-    pyautogui.leftClick()
-    time.sleep(2.5)
+    py.write("Nome do Documento")
+    press("tab")
+    py.write("Status")
+    sleep(2)
+    moveTo(x=695, y=525)
+    leftClick()
+    sleep(2)
     #confirma a criação
-    pyautogui.moveTo(x=622, y=550)
-    pyautogui.leftClick()
-    time.sleep(2.5)
+    moveTo(x=622, y=550)
+    leftClick()
+    sleep(2)
 
 def mesclarCelulas():
     cont = 0
     while cont<10:
-        with pyautogui.hold('shift'):
-            pyautogui.press(['right', 'right', 'right', 'right'])
-            time.sleep(1)
+        with py.hold('shift'):
+            press(['right', 'right', 'right', 'right'])
+            sleep(1)
             #Indo até a opção mesclar células
-            pyautogui.moveTo(x=619, y=112)
-            pyautogui.leftClick()
-            pyautogui.moveTo(x=655, y=217)
-            pyautogui.leftClick()
+            moveTo(x=619, y=112)
+            leftClick()
+            moveTo(x=655, y=217)
+            leftClick()
 
-        pyautogui.press("down", 1)
+        press("down", 1)
         cont = cont + 1
 
-    time.sleep(1)
-    pyautogui.moveTo(x=93, y=205)
-    pyautogui.leftClick()
-    pyautogui.press('right')
+    sleep(1)
+    moveTo(x=93, y=205)
+    leftClick()
+    press('right')
     cont = 0
     while cont<10:
-        with pyautogui.hold('shift'):
-            pyautogui.press(['right', 'right'])
-            time.sleep(1)
+        with py.hold('shift'):
+            press(['right', 'right'])
+            sleep(1)
             #Indo até a opção mesclar células
-            pyautogui.moveTo(x=619, y=112)
-            pyautogui.leftClick()
-            pyautogui.moveTo(x=655, y=217)
-            pyautogui.leftClick()
+            moveTo(x=619, y=112)
+            leftClick()
+            moveTo(x=655, y=217)
+            leftClick()
 
-        pyautogui.press("down", 1)
+        press("down", 1)
         cont = cont + 1
 
 def addInfoPlanilha(indice):
-    if (indice == 1):
-        pyautogui.moveTo(x=93, y=205)
-        pyautogui.leftClick()
-    time.sleep(1.3)
-    pyautogui.press("space")
-    pyautogui.press("backspace")
-    time.sleep(1.3)
-    pyautogui.write(NameFIle)
-    # pyautogui.press("enter")
-    pyautogui.press("tab")
-    pyautogui.write(Status)
-    pyautogui.press("enter")
-    time.sleep(2)
+    if indice == 1:
+        moveTo(x=93, y=205)
+        leftClick()
+    sleep(1)
+    press("space")
+    press("backspace")
+    sleep(1)
+    py.write(NameFIle)
+    # py.press("enter")
+    press("tab")
+    py.write(Status)
+    press("enter")
+    sleep(2)
 
 def salvarPlanilha(indice):
-    time.sleep(1)
-    pyautogui.moveTo(x=37, y=48)
-    pyautogui.leftClick()
-    time.sleep(1)
-    if (indice == 1):
-        pyautogui.moveTo(x=116, y=228)
-        pyautogui.leftClick()
-        pyautogui.moveTo(x=396, y=322)
-        pyautogui.doubleClick()
-        pyautogui.press("tab")
-        time.sleep(1)
-        pyautogui.write("Relatorio de execucao")
-        time.sleep(1)
-        pyautogui.press("enter")
+    sleep(1)
+    moveTo(x=37, y=48)
+    leftClick()
+    sleep(1)
+    if indice == 1:
+        moveTo(x=116, y=228)
+        leftClick()
+        moveTo(x=396, y=322)
+        doubleClick()
+        press("tab")
+        sleep(1)
+        py.write("Relatorio de execucao")
+        sleep(1)
+        press("enter")
     else:
-        time.sleep(1)
-        pyautogui.moveTo(x=95, y=189)
-        pyautogui.leftClick()
+        sleep(1)
+        moveTo(x=95, y=189)
+        leftClick()
 
     closeFile()
+
 
 # ----------------------------------------------------------------------------
 
 def searchFiles(nameDirectory, nameFile):
     #Acessando o diretorio
-    pyautogui.moveTo(x=615, y=68)
-    pyautogui.leftClick()
-    time.sleep(2)
-    pyautogui.write(nameDirectory)
-    pyautogui.press("enter")
+    moveTo(x=615, y=68)
+    leftClick()
+    sleep(2)
+    py.write(nameDirectory)
+    press("enter")
     #Pesquisando e acessando o arquivo
-    time.sleep(2)
-    pyautogui.moveTo(x=724, y=64)
-    pyautogui.leftClick()
-    time.sleep(5)
-    pyautogui.write(nameFile)
-    pyautogui.press("enter")
+    sleep(2)
+    moveTo(x=724, y=64)
+    leftClick()
+    sleep(2)
+    py.write(nameFile)
+    press("enter")
 
 def closeFile():
-    pyautogui.moveTo(x=345, y=11)
-    time.sleep(1)
-    pyautogui.leftClick()
-    time.sleep(2)
+    moveTo(x=345, y=11)
+    sleep(1)
+    leftClick()
+    sleep(2)

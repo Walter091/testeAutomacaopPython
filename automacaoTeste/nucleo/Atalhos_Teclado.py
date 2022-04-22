@@ -1,6 +1,6 @@
-import pyautogui
+import pyautogui as py
 import time
 
 def altTab():
-    pyautogui.hotkey("alt", "tab")
+    py.hotkey("alt", "tab")
     time.sleep(1.5)
