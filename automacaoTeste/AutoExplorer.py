@@ -4,6 +4,7 @@ import AutoBase
 import time
 from pyperclip import paste
 
+NumFile = None
 NameFIle = None
 Status = "Original"
 
@@ -48,10 +49,17 @@ def openPastaOriginal():
     pyautogui.moveTo(x=255, y=158)
     pyautogui.doubleClick()
 
+def ordenarPorPdf():
+    pyautogui.moveTo(x=569, y=103)
+    pyautogui.leftClick()
+    pyautogui.press("down")
+    pyautogui.press("enter")
+
 def abrirArquivo(indice):
     time.sleep(3)
     conteudo = None
     if (indice == 1):
+        ordenarPorPdf()
         pyautogui.press("down", 1)
         pyautogui.press("up")
         pyautogui.moveTo(x=524, y=133)
@@ -97,7 +105,7 @@ def salvarArquivo(indice):
     pyautogui.moveTo(x=83, y=239)
     pyautogui.leftClick()
     time.sleep(5)
-    pyautogui.write("Pagina " + str(indice) + " - Modificado")
+    pyautogui.write("Pagina " + NumFile + " - Modificado")
     time.sleep(3)
     pyautogui.press("enter")
     global Status
@@ -107,12 +115,21 @@ def validationArquivo(file):
     #Verifica se è numerica e .pdf
     if (file[0].isnumeric()):
         if(file.__contains__(".pdf")):
-            global NameFIle
-            #Adiciona a variavel para posterior utilização
-            NameFIle = file
+            setInfoNameFile(file)
             return True
     else:
         return False
+
+def setInfoNameFile(file):
+    global NumFile
+    global NameFIle
+    if(file[0:2].isnumeric()):
+        NumFile = file[0:2]
+    else:
+        NumFile = file[0]
+    # Adiciona a variavel para posterior utilização
+    NameFIle = file
+
 
 # ----------------------------------------------------------------------------
 
@@ -143,6 +160,8 @@ def createPlanilha(indice):
 
     addInfoPlanilha(indice)
     salvarPlanilha(indice)
+    if(indice != 1):
+        openPastaOriginal()
 
 def criarCabecalho():
     #Seleciona o campo do cabecalho
@@ -218,11 +237,13 @@ def mesclarCelulas():
         cont = cont + 1
 
 def addInfoPlanilha(indice):
-    i = indice - 1
-    pyautogui.moveTo(x=93, y=205)
-    pyautogui.leftClick()
-    pyautogui.press("down", i)
-    pyautogui.doubleClick()
+    if (indice == 1):
+        pyautogui.moveTo(x=93, y=205)
+        pyautogui.leftClick()
+    time.sleep(1.3)
+    pyautogui.press("space")
+    pyautogui.press("backspace")
+    time.sleep(1.3)
     pyautogui.write(NameFIle)
     # pyautogui.press("enter")
     pyautogui.press("tab")
@@ -235,12 +256,11 @@ def salvarPlanilha(indice):
     pyautogui.moveTo(x=37, y=48)
     pyautogui.leftClick()
     time.sleep(1)
-    pyautogui.moveTo(x=116, y=228)
-    pyautogui.leftClick()
     if (indice == 1):
-        time.sleep(1)
-        pyautogui.moveTo(x=396, y=322)
+        pyautogui.moveTo(x=116, y=228)
         pyautogui.leftClick()
+        pyautogui.moveTo(x=396, y=322)
+        pyautogui.doubleClick()
         pyautogui.press("tab")
         time.sleep(1)
         pyautogui.write("Relatorio de execucao")
