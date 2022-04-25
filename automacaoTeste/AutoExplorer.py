@@ -1,5 +1,4 @@
 import pyautogui as py
-import openpyxl
 from pyautogui import press, leftClick, rightClick, doubleClick, moveTo
 from nucleo import InfoMsg, Atalhos_Teclado
 import AutoBase
@@ -8,15 +7,21 @@ from pyperclip import paste
 
 class TesteAutomacao():
 
-    NumFile = None
-    NameFile = "None"
-    Status = "Original"
+    path = "C:\\Users\\hp\\Documents\\RPA-Artigo"
+    pathWithName = "C:\\Users\\hp\\Documents\\RPA-Artigo\\Relatorio de execucao.xlsx"
+    pathThis = "C:\\Users\\hp\\PycharmProjects\\TesteAutGPAguiaBr\\automacaoTeste\\Relatorio de execucao.xlsx"
+
+    nomePlanilha = "Relatorio de execucao.xlsx"
+    def __init__(self, numArquivo, nomeArquivo, status):
+        self.__numArquivo = numArquivo
+        self.__nomeArquivo = nomeArquivo
+        self.__status = status
 
     def Index(self):
         #mensagem alert
         InfoMsg.msgInicializacao("Automação iniciada. Por favor, não use o teclado "
                         "e nem mecha no mouse, para evitar erros!")
-
+        print('Automação iniciada')
         #Abrindo a Aréa de Trabalho
         AutoBase.toAreaDeTrabalho()
         #Abrindo o Explorador de Arquivos
@@ -32,14 +37,17 @@ class TesteAutomacao():
         entra = True
         indice = 1
         while entra:
-            if indice <= 11:
+            if indice <= 10:
                 if self.abrirArquivo(indice):
                     sleep(2)
-                    self.salvarArquivo(indice)
+                    self.salvarArquivo()
                     sleep(2)
                     self.closeFile()
                     Atalhos_Teclado.altTab()
-                    self.createPlanilha(indice, "Relatorio de execucao")
+                    if indice == 1:
+                        AutoBase.criarPlanilha(self.nomePlanilha)
+
+                    self.addInfoPlanilha(indice)
                     sleep(2)
                     indice = indice + 1
                     entra = True
@@ -52,7 +60,8 @@ class TesteAutomacao():
             else:
                 entra = False
 
-        InfoMsg("Automação encerrada. Obrigado e volte Sempre!")
+        AutoBase.moverPlanilha(self.pathThis, self.path)
+        InfoMsg.msgInicializacao("Automação encerrada. Obrigado e volte Sempre!")
 
     def openPastaOriginal(self):
         self.searchFiles("Downloads", "RPA-Artigo")
@@ -74,8 +83,8 @@ class TesteAutomacao():
         sleep(2)
         conteudo = None
         if indice == 1:
-            self.ordenarPorPdf()
-            self.ordenarPorNome()
+            # self.ordenarPorPdf()
+            # self.ordenarPorNome()
             press("down", 1)
             press("up")
             moveTo(x=524, y=133)
@@ -95,7 +104,7 @@ class TesteAutomacao():
             else:
                 return False
         else:
-            press("down", indice-1)
+            press("down", 1)
             press("apps")
             press("down", 5)
             press("enter")
@@ -112,21 +121,6 @@ class TesteAutomacao():
             else:
                 return False
 
-
-    def salvarArquivo(self, indice):
-        sleep(5)
-        moveTo(x=31, y=50)
-        leftClick()
-        sleep(3)
-        moveTo(x=83, y=239)
-        leftClick()
-        sleep(4)
-        py.write("Pagina " + NumFile + " - Modificado")
-        sleep(3)
-        press("enter")
-        global Status
-        Status = "documento alterado"
-
     def validationArquivo(self, file):
         #Verifica se è numerica e .pdf
         if file[0].isnumeric():
@@ -137,92 +131,66 @@ class TesteAutomacao():
             return False
 
     def setInfoNameFile(self, file):
-        global NumFile
-        global NameFIle
+        # global numFile
+        # global nameFile
         if file[0:2].isnumeric():
-            NumFile = file[0:2]
+            self.set_numArquivo(file[0:2])
         else:
-            NumFile = file[0]
+            self.set_numArquivo(file[0])
         # Adiciona a variavel para posterior utilização
-        NameFIle = file
+        self.set_nomeArquivo(file)
 
+    def salvarArquivo(self):
+        sleep(5)
+        moveTo(x=31, y=50)
+        leftClick()
+        sleep(3)
+        moveTo(x=83, y=239)
+        leftClick()
+        sleep(4)
+        py.write("Pagina " + self.__numArquivo + " - Modificado")
+        sleep(3)
+        press("enter")
+        global Status
+        self.set_status("documento alterado")
 
-    # ----------------------------------------------------------------------------
+        print("Arquivo Salvo")
 
-    def createPlanilha(self, indice, nomePlanilha):
-        planilha = openpyxl.Workbook()
-        planilha.create_sheet('Documentos')
-        planilha.save(planilha)
+    # def mesclarCelulasPlanilha(self, indice, planilha):
+    #     # Mesclar a Célula do nome do documento
+    #     AutoBase.mesclarCelulas(planilha, 'A1:D1', 1, 1, 1, 4)
+    #     # Mesclar a Célula do status do documento
+    #     AutoBase.mesclarCelulas(planilha, 'E1:G1', 1, 1, 5, 8)
+    #     # Mesclar o resto das celulas
+    #     i = 1
+    #     linhaInicial = 2
+    #     linhaFinal = 2
+    #     while i < 10:
+    #         AutoBase.mesclarCelulas(planilha, 'A' + str(linhaInicial) + ':D' + str(linhaFinal), linhaInicial, linhaFinal, 1, 4)
+    #         AutoBase.mesclarCelulas(planilha, 'E' + str(linhaInicial) + ':G' + str(linhaFinal), linhaInicial, linhaFinal, 5, 8)
+    #         linhaInicial = linhaInicial + 1
+    #         linhaFinal = linhaFinal + 1
+    #         i = i + 1
 
-        self.addInfoPlanilha(indice, planilha)
-        print("Planilha Criada!")
+    def setDimensaoCelula(self, planilha, larguraColuna1, larguraColuna2):
+        actv = planilha.active
+        actv.column_dimensions['A'].width = larguraColuna1
+        actv.column_dimensions['B'].width = larguraColuna2
 
-        self.salvarPlanilha(nomePlanilha)
-
-    def mesclarCelulas(self, planilha):
-        #Mesclando as células do Nome do documento
-        clls = planilha.active
-        clls.merge_cells('A2:D2')
-        clls.merge_cells(start_row=2, start_column=1, end_row=11, end_column=4)
-        #Mesclando as células do Status do documento
-        clls.merge_cells('E2:G2')
-        clls.merge_cells(start_row=2, start_column=5, end_row=11, end_column=8)
-
-    def addInfoPlanilha(self, indice, planilha):
-        self.mesclarCelulas()
-        planilha.load_workbook('Relatorio de execucao.xlsx')
-        documento = planilha['Documentos']
-        if indice == 1 :
+    def addInfoPlanilha(self, indice):
+        planilha = AutoBase.carregarPlanilha(self.nomePlanilha)
+        documento = planilha['Sheet']
+        if indice == 1:
+            # self.mesclarCelulasPlanilha(indice, planilha)
+            self.setDimensaoCelula(planilha, 52, 19)
             documento.append(["Nome do Documento", "Status"])
 
-        documento.append([self.Status, self.NameFile])
 
-    def salvarPlanilha(self, planilha, nome):
-        planilha.save(nome + '.xlsx')
-        print("Planilha Salva!")
+        documento.append([self.__nomeArquivo, self.__status])
+        print("Add info Sucess")
+        AutoBase.salvarPlanilha(planilha, self.nomePlanilha)
 
-    # def criarCabecalho(self):
-    #     #Seleciona o campo do cabecalho
-    #     sleep(5)
-    #     self.mesclarCelulas()
-    #     #Voltando pro começo da planilha
-    #     moveTo(x=93, y=205)
-    #     leftClick()
-    #     #Selecionando
-    #     with py.hold('shift'):
-    #         press('right')
-    #         press("down", 10)
-    #
-    #     #Clica em Inserir
-    #     moveTo(x=323, y=46)
-    #     leftClick()
-    #     sleep(1)
-    #     #Clica na setinha de lado
-    #     moveTo(x=1016, y=100)
-    #     leftClick()
-    #     sleep(2)
-    #     #Clica em cabecalho e rodapé
-    #     moveTo(x=359, y=94)
-    #     leftClick()
-    #     sleep(2)
-    #     #Clica em cabeçalho personalizado
-    #     moveTo(x=662, y=277)
-    #     leftClick()
-    #     sleep(2)
-    #     #Adiciona as colunas
-    #     py.write("Nome do Documento")
-    #     press("tab")
-    #     py.write("Status")
-    #     sleep(2)
-    #     moveTo(x=695, y=525)
-    #     leftClick()
-    #     sleep(2)
-    #     #confirma a criação
-    #     moveTo(x=622, y=550)
-    #     leftClick()
-    #     sleep(2)
-
-    # ----------------------------------------------------------------------------
+    # ---------------------------------------------------------------------
 
     def searchFiles(self, nameDirectory, nameFile):
         #Acessando o diretorio
@@ -244,3 +212,23 @@ class TesteAutomacao():
         sleep(1)
         leftClick()
         sleep(2)
+
+    # ---------------------------------------------------------------------
+
+    def get_numArquivo(self):
+        return self.__numArquivo
+
+    def set_numArquivo(self, numArquivo):
+        self.__numArquivo = numArquivo
+
+    def get_nomeArquivo(self):
+        return self.__nomeArquivo
+
+    def set_nomeArquivo(self, nomeArquivo):
+        self.__nomeArquivo = nomeArquivo
+
+    def get_status(self):
+        return self.__status
+
+    def set_status(self, status):
+        self.__status = status
