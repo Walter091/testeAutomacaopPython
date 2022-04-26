@@ -73,12 +73,12 @@ def moverPlanilha(caminho, novoCaminho):
 
 class git():
 
-    def addCommitAnPush(self):
+    def addCommitAnPush(self, msgCommit):
         self.abrirProjectAndGit()
         self.addA()
         print("Add Sucess")
         self.abrirProjectAndGit()
-        self.commit()
+        self.commit(msgCommit)
         print("Commit Sucess")
         self.abrirProjectAndGit()
         self.push()
@@ -100,11 +100,11 @@ class git():
         py.press("enter")
         time.sleep(5)
 
-    def commit(self):
+    def commit(self, msgCommit):
         time.sleep(1)
         py.press("enter")
         time.sleep(1)
-        py.write("commitMsg")
+        py.write(msgCommit)
         time.sleep(1)
         py.moveTo(x=73, y=430)
         py.leftClick()

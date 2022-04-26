@@ -7,5 +7,5 @@ import time
 # AutoBase.localizationPositionMouse()
 
 git = AutoBase.git()
-git.addCommitAnPush()
+git.addCommitAnPush("Adicionada a automação de versionamento")
 
