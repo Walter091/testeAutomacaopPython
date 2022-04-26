@@ -1,7 +1,7 @@
 import pyautogui as py
 from pyautogui import press, leftClick, rightClick, doubleClick, moveTo
 from nucleo import InfoMsg, Atalhos_Teclado
-import AutoBase
+from AutoBase import planilhaUtils, utils
 from time import sleep
 from pyperclip import paste
 
@@ -24,9 +24,9 @@ class TesteAutomacao():
         print('Automação iniciada')
 
         #Abrindo a Aréa de Trabalho
-        AutoBase.toAreaDeTrabalho()
+        utils.toAreaDeTrabalho()
         #Abrindo o Explorador de Arquivos
-        AutoBase.openExplorerFiles()
+        utils.openExplorerFiles()
         #Acessando e informando o caminho do arquivo zip
         self.openPastaOriginal()
 
@@ -41,7 +41,7 @@ class TesteAutomacao():
                     self.closeFile()
                     Atalhos_Teclado.altTab()
                     if indice == 1:
-                        AutoBase.criarPlanilha(self.nomePlanilha)
+                        planilhaUtils.criarPlanilha(self.nomePlanilha)
 
                     self.addInfoPlanilha(indice)
                     sleep(1)
@@ -57,7 +57,7 @@ class TesteAutomacao():
             else:
                 entra = False
 
-        AutoBase.moverPlanilha(self.pathThis, self.path)
+        planilhaUtils.moverPlanilha(self.pathThis, self.path)
         InfoMsg.msgInicializacao("Automação encerrada. Obrigado e volte Sempre!")
 
     def openPastaOriginal(self):
@@ -170,7 +170,7 @@ class TesteAutomacao():
         actv.column_dimensions['B'].width = larguraColuna2
 
     def addInfoPlanilha(self, indice):
-        planilha = AutoBase.carregarPlanilha(self.nomePlanilha)
+        planilha = planilhaUtils.carregarPlanilha(self.nomePlanilha)
         documento = planilha['Sheet']
         if indice == 1:
             # self.mesclarCelulasPlanilha(indice, planilha)
@@ -182,7 +182,7 @@ class TesteAutomacao():
         if indice == 1:
             print("Add info Sucess")
 
-        AutoBase.salvarPlanilha(planilha, self.nomePlanilha, False)
+        planilhaUtils.salvarPlanilha(planilha, self.nomePlanilha, False)
 
     # ---------------------------------------------------------------------
 
