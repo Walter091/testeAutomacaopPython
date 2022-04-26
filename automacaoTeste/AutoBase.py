@@ -116,8 +116,8 @@ class git():
         time.sleep(5)
 
     def push(self):
-        py.moveTo(x=608, y=293)
+        py.moveTo(x=870, y=39)
         py.leftClick()
         time.sleep(1)
-        py.moveTo(x=717, y=569)
+        py.moveTo(x=755, y=598)
         py.leftClick()
