@@ -2,40 +2,26 @@ import pyautogui as py
 import openpyxl as xl
 import shutil
 import time
+import smtplib
+from email.message import EmailMessage
 
 def localizationPositionMouse():
     py.alert("Você entrou no modo de Automação. "
                     "Te daremos 5 seconds para colocar o mouse na posição desejada!!")
     py.sleep(5)
     print(py.position())
-# -------------------------------------------------- Google
-def openGoogle():
-    py.alert("Você entrou no modo de Automação. "
-                    "Por favor não utilize o mouse nem o teclado!!")
-    py.press("winleft")
-    py.write("chrome")
-    py.press("enter")
-    py.sleep(4)
 
-def openWhatsapChrome():
-    openGoogle()
-    py.write("https://web.whatsapp.com/")
-    py.press("enter")
+def enviarEmailTexto(email, emailReceptor, senha, texto):
+    msg = EmailMessage()
+    msg['Subject'] = 'Email Automatizado...'
+    msg['From'] = email
+    msg['To'] = emailReceptor
+    msg.set_content(texto)
 
-def openYoutubeChrome():
-    openGoogle()
-    py.moveTo(x=407, y=482)
-    py.mouseDown()
-    time.sleep(2)
-    py.leftClick()
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        smtp.login(email, senha)
+        smtp.send_message(msg)
 
-def openTrello():
-    openGoogle()
-    time.sleep(3)
-    py.moveTo(x=58, y=77)
-    py.leftClick()
-    py.moveTo(x=82, y=112)
-    py.leftClick()
 # ---------------------------------------------------------- S.O
 def toAreaDeTrabalho():
     py.hotkey("winleft", "d")
@@ -60,7 +46,7 @@ def openExplorerFiles():
 
 def criarPlanilha(nomePlanilha):
     planilha = xl.Workbook()
-    salvarPlanilha(planilha, nomePlanilha)
+    salvarPlanilha(planilha, nomePlanilha, False)
     print("Planilha Criada!")
 
 def carregarPlanilha(caminho):
@@ -68,9 +54,10 @@ def carregarPlanilha(caminho):
     print('planilha Carregada')
     return planilha
 
-def salvarPlanilha(planilha, nome):
+def salvarPlanilha(planilha, nome, mostrarMsg):
     planilha.save(nome)
-    print("Planilha Salva!")
+    if mostrarMsg:
+        print("Planilha Salva!")
 
 def mesclarCelulas(planilha, celulas, linhaInicial, linhaFinal, colunaInicial, colunaFinal):
     clls = planilha.active

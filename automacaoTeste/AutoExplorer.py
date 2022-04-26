@@ -10,8 +10,8 @@ class TesteAutomacao():
     path = "C:\\Users\\hp\\Documents\\RPA-Artigo"
     pathWithName = "C:\\Users\\hp\\Documents\\RPA-Artigo\\Relatorio de execucao.xlsx"
     pathThis = "C:\\Users\\hp\\PycharmProjects\\TesteAutGPAguiaBr\\automacaoTeste\\Relatorio de execucao.xlsx"
-
     nomePlanilha = "Relatorio de execucao.xlsx"
+
     def __init__(self, numArquivo, nomeArquivo, status):
         self.__numArquivo = numArquivo
         self.__nomeArquivo = nomeArquivo
@@ -22,38 +22,35 @@ class TesteAutomacao():
         InfoMsg.msgInicializacao("Automação iniciada. Por favor, não use o teclado "
                         "e nem mecha no mouse, para evitar erros!")
         print('Automação iniciada')
+
         #Abrindo a Aréa de Trabalho
         AutoBase.toAreaDeTrabalho()
         #Abrindo o Explorador de Arquivos
         AutoBase.openExplorerFiles()
-        #Maximizando a tela
-        sleep(1)
-        moveTo(x=858, y=152)
-        leftClick()
-
         #Acessando e informando o caminho do arquivo zip
         self.openPastaOriginal()
 
         entra = True
         indice = 1
         while entra:
-            if indice <= 10:
+            if indice <= 11:
                 if self.abrirArquivo(indice):
-                    sleep(2)
-                    self.salvarArquivo()
-                    sleep(2)
+                    sleep(1)
+                    self.salvarArquivo(indice)
+                    sleep(1)
                     self.closeFile()
                     Atalhos_Teclado.altTab()
                     if indice == 1:
                         AutoBase.criarPlanilha(self.nomePlanilha)
 
                     self.addInfoPlanilha(indice)
-                    sleep(2)
+                    sleep(1)
+                    print("SUCESS PROCESS")
                     indice = indice + 1
                     entra = True
                 else:
                     InfoMsg.msgInicializacao("Impossivel Abrir arquivos .docx"
-                                             " ou arquivos que não começam com um Númeral!!"
+                                             " ou arquivos que não começam com um Númeral!! "
                                              "Pressione 'Enter' para Continuar.")
                     press("esc")
                     continue
@@ -131,8 +128,6 @@ class TesteAutomacao():
             return False
 
     def setInfoNameFile(self, file):
-        # global numFile
-        # global nameFile
         if file[0:2].isnumeric():
             self.set_numArquivo(file[0:2])
         else:
@@ -140,37 +135,34 @@ class TesteAutomacao():
         # Adiciona a variavel para posterior utilização
         self.set_nomeArquivo(file)
 
-    def salvarArquivo(self):
+    def salvarArquivo(self, indice):
         sleep(5)
         moveTo(x=31, y=50)
         leftClick()
         sleep(3)
         moveTo(x=83, y=239)
         leftClick()
-        sleep(4)
+        sleep(2)
+        if indice == 1:
+            self.doAntesDeSalvar()
         py.write("Pagina " + self.__numArquivo + " - Modificado")
-        sleep(3)
+        sleep(2)
         press("enter")
         global Status
         self.set_status("documento alterado")
 
-        print("Arquivo Salvo")
-
-    # def mesclarCelulasPlanilha(self, indice, planilha):
-    #     # Mesclar a Célula do nome do documento
-    #     AutoBase.mesclarCelulas(planilha, 'A1:D1', 1, 1, 1, 4)
-    #     # Mesclar a Célula do status do documento
-    #     AutoBase.mesclarCelulas(planilha, 'E1:G1', 1, 1, 5, 8)
-    #     # Mesclar o resto das celulas
-    #     i = 1
-    #     linhaInicial = 2
-    #     linhaFinal = 2
-    #     while i < 10:
-    #         AutoBase.mesclarCelulas(planilha, 'A' + str(linhaInicial) + ':D' + str(linhaFinal), linhaInicial, linhaFinal, 1, 4)
-    #         AutoBase.mesclarCelulas(planilha, 'E' + str(linhaInicial) + ':G' + str(linhaFinal), linhaInicial, linhaFinal, 5, 8)
-    #         linhaInicial = linhaInicial + 1
-    #         linhaFinal = linhaFinal + 1
-    #         i = i + 1
+    def doAntesDeSalvar(self):
+        sleep(2)
+        moveTo(x=493, y=104)
+        leftClick()
+        sleep(1.5)
+        moveTo(x=408, y=285)
+        leftClick()
+        sleep(1)
+        moveTo(x=341, y=319)
+        doubleClick()
+        sleep(1)
+        press("tab")
 
     def setDimensaoCelula(self, planilha, larguraColuna1, larguraColuna2):
         actv = planilha.active
@@ -187,8 +179,10 @@ class TesteAutomacao():
 
 
         documento.append([self.__nomeArquivo, self.__status])
-        print("Add info Sucess")
-        AutoBase.salvarPlanilha(planilha, self.nomePlanilha)
+        if indice == 1:
+            print("Add info Sucess")
+
+        AutoBase.salvarPlanilha(planilha, self.nomePlanilha, False)
 
     # ---------------------------------------------------------------------
 
@@ -203,7 +197,7 @@ class TesteAutomacao():
         sleep(2)
         moveTo(x=724, y=64)
         leftClick()
-        sleep(2)
+        sleep(4)
         py.write(nameFile)
         press("enter")
 
